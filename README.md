@@ -16,7 +16,7 @@ Read the full rules [here](https://playjoy.com/en/durak/rules/).
 
 ### Windows
 
-Download and run the `.msi` installer from the [latest release](https://github.com/DMFriends/sequence/releases/latest).
+Download and run the `.msi` installer from the [latest release](https://github.com/DMFriends/durak/releases/latest).
 
 When you run the latest `.msi`, it uninstalls previous versions of the app from your device.
 
@@ -28,4 +28,4 @@ published. The release workflow produces:
 - Linux: `.deb`
 - macOS: `.dmg`
 
-You can download those packages from the [latest release](https://github.com/DMFriends/sequence/releases/latest). You may need to manually uninstall previous versions.
+You can download those packages from the [latest release](https://github.com/DMFriends/durak/releases/latest). You may need to manually uninstall previous versions.
