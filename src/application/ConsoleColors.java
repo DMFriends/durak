@@ -1,3 +1,5 @@
+package application;
+
 public class ConsoleColors
 {
     public static final String RESET = "\u001B[0m";

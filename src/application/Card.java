@@ -1,3 +1,5 @@
+package application;
+
 public class Card
 {
 	// These constants represent the possible suits and 

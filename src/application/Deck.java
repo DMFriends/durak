@@ -1,3 +1,5 @@
+package application;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -29,11 +31,7 @@ public class Deck
 	{
 	    for(int i = 0; i < 6; i++)
 	    {
-    	    int randIndex = (int) (Math.random() * deck.size());
-            String randomCard = deck.get(randIndex).toString();
-            deck.remove(deck.get(randIndex));
-            
-            p.getCards().add(new Card(randomCard));
+            p.getCards().add(draw());
 	    }
 	}
 	
@@ -41,7 +39,7 @@ public class Deck
     {
         int randIndex = (int) (Math.random() * deck.size());
         trumpCard = deck.get(randIndex);
-        trumpSuit = trumpCard.toString().substring(1);
+        trumpSuit = trumpCard.toString().substring(trumpCard.toString().length() - 1);
         deck.remove(trumpCard);
         deck.add(0, trumpCard);
         return trumpCard;

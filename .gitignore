@@ -1,0 +1,7 @@
+/bin/
+/dist/
+.classpath
+.project
+*.class
+*.jar
+*.ico
