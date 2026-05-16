@@ -182,7 +182,15 @@ public class Main extends Application
         startButton.getStyleClass().add("primary-button");
         startButton.setOnAction(_ -> startGame(nameFields));
 
-        setupPanel.getChildren().addAll(title, subtitle, labelledControl("Players", playerCountBox), nameFields, startButton);
+        Button rulesButton = new Button("Read Rules");
+        rulesButton.getStyleClass().add("primary-button");
+        rulesButton.setTooltip(new Tooltip("Open Durak rules"));
+        rulesButton.setOnAction(_ -> getHostServices().showDocument("https://playjoy.com/en/durak/rules/"));
+
+        HBox startActions = new HBox(10, startButton, rulesButton);
+        startActions.setAlignment(Pos.CENTER_LEFT);
+
+        setupPanel.getChildren().addAll(title, subtitle, labelledControl("Players", playerCountBox), nameFields, startActions);
         root.setCenter(setupPanel);
         return root;
     }
