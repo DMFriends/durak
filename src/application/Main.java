@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -38,6 +39,8 @@ public class Main extends Application
     private final List<Card> tableAttacks = new ArrayList<>();
     private final List<Card> tableDefenses = new ArrayList<>();
     private final List<String> selectedCardIds = new ArrayList<>();
+    private final ArrayList<PlayedCardPair> recentlyPlayedCardPairs = new ArrayList<PlayedCardPair>();
+    private final ArrayList<Integer> tableRecentPairIndexes = new ArrayList<Integer>();
 
     private Stage primaryStage;
     private Scene appScene;
@@ -54,7 +57,7 @@ public class Main extends Application
     private int attackerIndex;
     private int defenderIndex = 1;
     
-    public static final String APP_VERSION = "v2.0";
+    public static final String APP_VERSION = "v2.1";
 
     public static void main(String[] args)
     {
@@ -222,6 +225,8 @@ public class Main extends Application
         tableAttacks.clear();
         tableDefenses.clear();
         selectedCardIds.clear();
+        recentlyPlayedCardPairs.clear();
+        tableRecentPairIndexes.clear();
 
         deck = new Deck();
         trumpCard = deck.getTrumpCard();
@@ -319,7 +324,8 @@ public class Main extends Application
         VBox actions = new VBox(10,
             actionButton("Play Selected", "Play the selected card or cards", this::playSelectedCards),
             actionButton("Take", "Defender takes all table cards", this::takeCards),
-            actionButton("Pass", "Attacker passes after all cards are defended", this::passTurn)
+            actionButton("Pass", "Attacker passes after all cards are defended", this::passTurn),
+            actionButton("Recently Played", "Open recently played card pairs", this::showRecentlyPlayedWindow)
         );
         actions.setAlignment(Pos.CENTER);
 
@@ -523,6 +529,8 @@ public class Main extends Application
             attacker.getHand().remove(card);
             tableAttacks.add(card);
             tableDefenses.add(null);
+            recentlyPlayedCardPairs.add(new PlayedCardPair(card, playerNames.get(attackerIndex), playerNames.get(defenderIndex)));
+            tableRecentPairIndexes.add(recentlyPlayedCardPairs.size() - 1);
         }
 
         if(showWinnerIfGameOver())
@@ -566,8 +574,10 @@ public class Main extends Application
         for(int i = 0; i < cards.size(); i++)
         {
             Card card = cards.get(i);
+            int matchedAttackIndex = matchedAttackIndexes.get(i);
             players.get(defenderIndex).getHand().remove(card);
-            tableDefenses.set(matchedAttackIndexes.get(i), card);
+            tableDefenses.set(matchedAttackIndex, card);
+            updateRecentlyPlayedDefense(matchedAttackIndex, card);
         }
 
         if(showWinnerIfGameOver())
@@ -767,6 +777,7 @@ public class Main extends Application
         String taker = playerNames.get(defenderIndex);
         tableAttacks.clear();
         tableDefenses.clear();
+        tableRecentPairIndexes.clear();
         replenishHands();
 
         if(showWinnerIfGameOver())
@@ -809,6 +820,7 @@ public class Main extends Application
         String newAttacker = playerNames.get(defenderIndex);
         tableAttacks.clear();
         tableDefenses.clear();
+        tableRecentPairIndexes.clear();
         replenishHands();
 
         if(showWinnerIfGameOver())
@@ -948,6 +960,104 @@ public class Main extends Application
         return cards.toString();
     }
 
+    private void updateRecentlyPlayedDefense(int tableAttackIndex, Card defenseCard)
+    {
+        if(tableAttackIndex < tableRecentPairIndexes.size())
+        {
+            recentlyPlayedCardPairs.get(tableRecentPairIndexes.get(tableAttackIndex)).setDefenseCard(defenseCard);
+        }
+    }
+
+    private void showRecentlyPlayedWindow()
+    {
+        Stage window = new Stage();
+        window.setTitle("Recently Played Cards");
+        window.initOwner(primaryStage);
+        window.getIcons().add(
+            new Image(
+                Objects.requireNonNull(
+                    getClass().getResourceAsStream("/resources/durak.png")
+                )
+            )
+        );
+
+        BorderPane root = new BorderPane();
+        root.getStyleClass().add("recent-window");
+
+        VBox list = new VBox(12);
+        list.setAlignment(Pos.TOP_CENTER);
+        list.setFillWidth(false);
+        list.setMaxWidth(430);
+        list.getStyleClass().add("recent-list");
+
+        if(recentlyPlayedCardPairs.isEmpty())
+        {
+            Label empty = new Label("No cards have been played yet.");
+            empty.getStyleClass().add("recent-empty");
+            list.getChildren().add(empty);
+        }
+        else
+        {
+            for(int i = recentlyPlayedCardPairs.size() - 1; i >= 0; i--)
+            {
+                list.getChildren().add(createRecentlyPlayedRow(recentlyPlayedCardPairs.get(i)));
+            }
+        }
+
+        StackPane listWrapper = new StackPane(list);
+        listWrapper.setAlignment(Pos.TOP_CENTER);
+        listWrapper.getStyleClass().add("recent-list-wrapper");
+
+        ScrollPane scrollPane = new ScrollPane(listWrapper);
+        scrollPane.setFitToWidth(true);
+        scrollPane.getStyleClass().add("recent-scroll");
+        root.setCenter(scrollPane);
+
+        Scene scene = new Scene(root, 620, 620);
+        scene.getStylesheets().add(getClass().getResource("/resources/durak-design.css").toExternalForm());
+        window.setScene(scene);
+        window.show();
+    }
+
+    private HBox createRecentlyPlayedRow(PlayedCardPair pair)
+    {
+        Label players = new Label("Attacker: " + pair.getAttackerName() + "\nDefender: " + pair.getDefenderName());
+        players.getStyleClass().add("recent-pair-players");
+
+        HBox cards = new HBox(18);
+        cards.setAlignment(Pos.CENTER);
+        cards.getStyleClass().add("recent-pair-cards");
+        cards.getChildren().add(createRecentCardColumn("Attacking Card", cardView(pair.getAttackCard().toString(), false, false)));
+
+        if(pair.getDefenseCard() == null)
+        {
+            Label pending = new Label("No defense");
+            pending.getStyleClass().addAll("pending-label", "recent-no-defense");
+            cards.getChildren().add(createRecentCardColumn("Defending Card", pending));
+        }
+        else
+        {
+            cards.getChildren().add(createRecentCardColumn("Defending Card", cardView(pair.getDefenseCard().toString(), false, false)));
+        }
+
+        HBox row = new HBox(14, players, cards);
+        row.setAlignment(Pos.CENTER);
+        row.setMaxWidth(Region.USE_PREF_SIZE);
+        row.getStyleClass().add("recent-pair-row");
+        return row;
+    }
+
+    private VBox createRecentCardColumn(String labelText, Parent cardNode)
+    {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("recent-card-label");
+
+        VBox column = new VBox(7, label, cardNode);
+        column.setAlignment(Pos.CENTER);
+        column.getStyleClass().add("recent-card-column");
+        return column;
+    }
+
     private void clearSelection()
     {
         selectedCardIds.clear();
@@ -1029,6 +1139,46 @@ public class Main extends Application
             statusLabel.setText(currentPlayerIndex == attackerIndex
                 ? "Play any card to start the attack. Later attacks must match a table rank."
                 : "Defend the oldest open attack with a higher same-suit card or a valid trump.");
+        }
+    }
+
+    private static class PlayedCardPair
+    {
+        private final Card attackCard;
+        private final String attackerName;
+        private final String defenderName;
+        private Card defenseCard;
+
+        private PlayedCardPair(Card attackCard, String attackerName, String defenderName)
+        {
+            this.attackCard = attackCard;
+            this.attackerName = attackerName;
+            this.defenderName = defenderName;
+        }
+
+        private Card getAttackCard()
+        {
+            return attackCard;
+        }
+
+        private Card getDefenseCard()
+        {
+            return defenseCard;
+        }
+
+        private String getAttackerName()
+        {
+            return attackerName;
+        }
+
+        private String getDefenderName()
+        {
+            return defenderName;
+        }
+
+        private void setDefenseCard(Card defenseCard)
+        {
+            this.defenseCard = defenseCard;
         }
     }
 }

@@ -296,3 +296,81 @@
 .action-button:hover {
     -fx-background-color: #ffd56a;
 }
+
+.recent-window {
+    -fx-background-color: #113529;
+    -fx-padding: 18;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.recent-title {
+    -fx-padding: 0 0 16 0;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #f5f0dc;
+}
+
+.recent-scroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255, 255, 255, 0.14);
+    -fx-border-radius: 8px;
+}
+
+.recent-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.recent-list-wrapper {
+    -fx-padding: 18;
+    -fx-background-color: #173a30;
+}
+
+.recent-list {
+    -fx-max-width: 430px;
+    -fx-alignment: top-center;
+    -fx-fill-width: false;
+}
+
+.recent-pair-row {
+    -fx-padding: 12;
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 8px;
+    -fx-alignment: center;
+}
+
+.recent-pair-players {
+    -fx-min-width: 126px;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #f2c14e;
+    -fx-line-spacing: 5px;
+}
+
+.recent-pair-cards {
+    -fx-min-width: 250px;
+    -fx-alignment: center;
+}
+
+.recent-card-column {
+    -fx-min-width: 116px;
+}
+
+.recent-card-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #d8ead8;
+}
+
+.recent-no-defense {
+    -fx-text-fill: #6dff9a;
+    -fx-border-color: rgba(109, 255, 154, 0.56);
+    -fx-background-color: rgba(109, 255, 154, 0.14);
+}
+
+.recent-empty {
+    -fx-padding: 28;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #d8ead8;
+}
